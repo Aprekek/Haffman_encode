@@ -1,7 +1,7 @@
 .PHONY: test
 .PHONY: clean
 .PHONY: all
-CC = gcc
+CC = gcc -g3 -O0 
 CFLAGS = -Wall -Wextra -Werror -Wshadow
 DEPFLAGS = -MP -MMD 
 DEPDIR = dep/main/
@@ -17,10 +17,10 @@ EXECUTABLE = $(BINDIR)main
 all: dirs $(EXECUTABLE)
  
 $(EXECUTABLE): $(OBJ_FILES)
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(CFLAGS) -o $@ $^
  
 $(OBJDIR)%.o : $(SRCDIR)%.c
-	$(CC) $(CFLAGS) $(DEPFLAGS) $(LIBS) -c -o $@ $< 
+	$(CC) $(CFLAGS) $(DEPFLAGS) -c -o $@ $< 
 	mv -f $(OBJDIR)$*.d $(DEPDIR)$*.d
 
 dirs:
