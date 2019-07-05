@@ -11,7 +11,7 @@ typedef struct
 typedef struct
 {
     unsigned int count;
-    unsigned char symbol;
+    char symbol;
 } vector_s_count;
 
 #endif

@@ -6,7 +6,7 @@
 #include "include/vector_s_count.h"
 
 size_t capacity = 1000;
-size_t capacity_symbols = 128;
+size_t symbols = 128;
 
 int main()
 {
@@ -20,12 +20,15 @@ int main()
         fclose(fin);
         exit(EXIT_FAILURE);
     }
-    vector *nm_arr;
-    vector_s_count cnt_nm_arr[capacity_symbols];
-    nm_arr = vector_init();
-    file_works(nm_arr, cnt_nm_arr, fin);
-    printf("%s", nm_arr->array);
 
+    vector *nm_arr;
+    vector_s_count *cnt_nm_arr = malloc(sizeof(vector_s_count) * symbols);
+
+    nm_arr = vector_init();
+    file_works(nm_arr, cnt_nm_arr, fin); //считываем слова из файла и делаем подсчет
+
+
+    free(cnt_nm_arr);
     free(nm_arr->array);
     free(nm_arr);
     fclose(fin);
