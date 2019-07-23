@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "include/encode.h"
 #include "include/file.h"
 #include "include/types.h"
 #include "include/vector.h"
@@ -26,7 +27,19 @@ int main()
 
     nm_arr = vector_init();
     file_works(nm_arr, cnt_nm_arr, fin); //считываем слова из файла и делаем подсчет
+    Sort(cnt_nm_arr);                    //сортируем символы по возрастанию по частоте встречаемости
 
+    /*    for (unsigned int i = 0; i < symbols; i++)
+    {
+        if (cnt_nm_arr[i].weight != 0)
+        {
+            int x = cnt_nm_arr[i].symbol;
+            printf("[%d] %c %d\n", x, cnt_nm_arr[i].symbol, cnt_nm_arr[i].weight);
+        }
+    }*/
+
+    /*   h_tree *tree = h_tree_init();
+    h_tree_node_init(tree, cnt_nm_arr);*/
 
     free(cnt_nm_arr);
     free(nm_arr->array);

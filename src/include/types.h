@@ -10,8 +10,23 @@ typedef struct
 
 typedef struct
 {
-    unsigned int count;
+    unsigned int weight;
     char symbol;
 } vector_s_count;
 
+typedef struct h_node h_node;
+
+struct h_node
+{
+    unsigned int weight;
+    char s;
+    h_node *ajacent;
+    h_node *left;
+    h_node *right;
+};
+typedef struct
+{
+    unsigned int size;
+    h_node *head;
+} h_tree;
 #endif
