@@ -7,7 +7,7 @@
 #include "include/vector_s_count.h"
 
 size_t capacity = 1000;
-size_t symbols = 128;
+size_t symbols = 256;
 
 int main()
 {
@@ -41,7 +41,7 @@ int main()
     dequeue_code(tree, symbols_code, size);
     uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * nm_arr->size);
 
-    encode(code_vector, nm_arr, cnt_nm_arr);
+    encode_process(code_vector, nm_arr, symbols_code);
 
     for (unsigned int i = 0; i < symbols; i++)
     {

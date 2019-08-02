@@ -224,7 +224,7 @@ unsigned int h_tree_sift(h_tree *tree, vector_s_count **vctr_s_cnt)
 
 void dequeue_code(h_tree *tree, vector_s_count **s_codes, unsigned int size)
 {
-    uint8_t code = 0;
+    code_type code = 0;
     unsigned int length = 0;
     h_node *node = NULL, *prew = NULL;
     while (size > 0)
@@ -260,4 +260,71 @@ void dequeue_code(h_tree *tree, vector_s_count **s_codes, unsigned int size)
         code = 0x0;
         length = 0;
     }
+}
+
+unsigned int encode_process(uint8_t *code_vector, vector *vctr, vector_s_count **s_codes)
+{
+    code_type code = 0x0;
+    code_type tmp_code = 0x0;
+    char lenght = 0;
+    char byte_lenght = 0;
+    unsigned int total_bytes = 0;
+    unsigned int ch_int;
+    char old_lenght;
+
+    for (unsigned int i = 0; i < vctr->size; i++)
+    {
+        if (byte_lenght == 8)
+        {
+            byte_lenght = 0;
+            total_bytes++;
+        }
+
+        ch_int = vctr->array[i];
+        tmp_code = s_codes[ch_int]->code;
+        lenght = s_codes[ch_int]->lenght;
+
+        if (byte_lenght + lenght <= 8)
+        {
+            code_vector[total_bytes] |= tmp_code;
+            byte_lenght += lenght;
+            code_vector[total_bytes] <<= (8 - byte_lenght); 
+        }
+        else
+        {
+            while (lenght > 0)
+            {
+                if (byte_lenght == 8)
+                {
+                    byte_lenght = 0;
+                    total_bytes++;
+                }
+
+                code = tmp_code;
+                old_lenght = lenght;
+                lenght = lenght - (8 - byte_lenght);
+
+                if (lenght >= 0)
+                {
+                    tmp_code >>= lenght;
+                    byte_lenght += old_lenght - lenght;
+                }
+
+                code_vector[total_bytes] |= tmp_code;
+
+                if (lenght < 0)
+                {
+                    code_vector[total_bytes] <<= (abs(lenght));
+                    byte_lenght = old_lenght;
+                }
+
+                if (lenght > 0)
+                {
+                    tmp_code = code << (sizeof(code_type) * 8 - lenght);
+                    tmp_code >>= sizeof(code_type) * 8 - lenght;
+                }
+            }
+        }
+    }
+    return total_bytes;
 }
