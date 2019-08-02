@@ -61,32 +61,6 @@ int main()
 
     fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
 
-    fclose(fout);
-    if ((fout = fopen("symbols_binary.txt", "rb")) == NULL)
-    {
-        fclose(fin);
-        exit(EXIT_FAILURE);
-    }
-    uint8_t ssize;
-    uint16_t cde;
-    uint8_t smbol;
-    uint8_t lenght;
-    fread(&ssize, sizeof(uint8_t), 1, fout);
-    fread(&smbol, sizeof(uint8_t), 1, fout);
-    fread(&lenght, sizeof(uint8_t), 1, fout);
-    fread(&cde, sizeof(uint16_t), 1, fout);
-    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
-
-    fread(&smbol, sizeof(uint8_t), 1, fout);
-    fread(&lenght, sizeof(uint8_t), 1, fout);
-    fread(&cde, sizeof(uint16_t), 1, fout);
-    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
-
-    fread(&smbol, sizeof(uint8_t), 1, fout);
-    fread(&lenght, sizeof(uint8_t), 1, fout);
-    fread(&cde, sizeof(uint16_t), 1, fout);
-    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
-
     free(code_vector);
     free(tree);
     free(symbols_code);

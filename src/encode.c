@@ -86,9 +86,9 @@ h_node *dequeue_min(h_tree *tree)
 
     while ((node->right != NULL) || (node->left != NULL) || (node->ajacent != NULL))
     {
-        prew = node;
         if ((node->left != NULL) && (node->flag != -1))
         {
+            prew = node;
             node = node->left;
         }
         else if ((tree->head->flag == -1) || (tree->head->left == NULL))
@@ -98,9 +98,16 @@ h_node *dequeue_min(h_tree *tree)
             node->ajacent = NULL;
             return node;
         }
-        else
+        else if (prew == tree->head)
         {
             tree->head->left = node->ajacent;
+            tree->size--;
+            node->ajacent = NULL;
+            return node;
+        }
+        else
+        {
+            prew->left = node->ajacent;
             tree->size--;
             node->ajacent = NULL;
             return node;
