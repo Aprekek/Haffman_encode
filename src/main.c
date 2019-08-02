@@ -1,3 +1,6 @@
+// переменные типа char в структурах могут не корректно вести себя
+// если пытаться считать символы из второй части ascii.
+// unsigned char???
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/encode.h"
@@ -41,7 +44,8 @@ int main()
     dequeue_code(tree, symbols_code, size);
     uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * nm_arr->size);
 
-    encode_process(code_vector, nm_arr, symbols_code);
+    uint8_t past_byte_lenght = 0;
+    uint32_t total_bytes = encode_process(code_vector, nm_arr, symbols_code, &past_byte_lenght);
 
     for (unsigned int i = 0; i < symbols; i++)
     {
@@ -54,6 +58,36 @@ int main()
                    cnt_nm_arr[i]->weight, cnt_nm_arr[i]->lenght);
         }
     }
+
+    fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
+
+    fclose(fout);
+    if ((fout = fopen("symbols_binary.txt", "rb")) == NULL)
+    {
+        fclose(fin);
+        exit(EXIT_FAILURE);
+    }
+    uint8_t ssize;
+    uint16_t cde;
+    uint8_t smbol;
+    uint8_t lenght;
+    fread(&ssize, sizeof(uint8_t), 1, fout);
+    fread(&smbol, sizeof(uint8_t), 1, fout);
+    fread(&lenght, sizeof(uint8_t), 1, fout);
+    fread(&cde, sizeof(uint16_t), 1, fout);
+    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
+
+    fread(&smbol, sizeof(uint8_t), 1, fout);
+    fread(&lenght, sizeof(uint8_t), 1, fout);
+    fread(&cde, sizeof(uint16_t), 1, fout);
+    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
+
+    fread(&smbol, sizeof(uint8_t), 1, fout);
+    fread(&lenght, sizeof(uint8_t), 1, fout);
+    fread(&cde, sizeof(uint16_t), 1, fout);
+    printf("\n%d\n%c (%d) - %0x\n", ssize, smbol, lenght, cde);
+
+    free(code_vector);
     free(tree);
     free(symbols_code);
     free(cnt_nm_arr);

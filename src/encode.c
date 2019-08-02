@@ -16,13 +16,14 @@ h_tree *h_tree_init()
     return tree;
 }
 
-h_node *h_node_init(char ch, unsigned int weight)
+h_node *h_node_init(__size_smbls ch, unsigned int weight, char flag)
 {
     h_node *node = malloc(sizeof(*node));
     if (node != NULL)
     {
         node->weight = weight;
         node->s = ch;
+        node->flag = flag;
         node->ajacent = NULL; //когда созданный узел получился с самым большим или равным
                               // весом и добавление следующих узлов больше него
                               //происходят по этому указателю
@@ -32,10 +33,10 @@ h_node *h_node_init(char ch, unsigned int weight)
     return node;
 }
 
-void h_tree_node_add(h_tree *tree, char ch, unsigned int weight)
+void h_tree_node_add(h_tree *tree, __size_smbls ch, unsigned int weight)
 {
 
-    h_node *node = h_node_init(ch, weight);
+    h_node *node = h_node_init(ch, weight, 0);
 
     if (tree->head == NULL)
     {
@@ -86,11 +87,11 @@ h_node *dequeue_min(h_tree *tree)
     while ((node->right != NULL) || (node->left != NULL) || (node->ajacent != NULL))
     {
         prew = node;
-        if ((node->left != NULL) && (node->s != -1))
+        if ((node->left != NULL) && (node->flag != -1))
         {
             node = node->left;
         }
-        else if ((tree->head->s == -1) || (tree->head->left == NULL))
+        else if ((tree->head->flag == -1) || (tree->head->left == NULL))
         {
             tree->head = node->ajacent;
             tree->size--;
@@ -123,7 +124,7 @@ void queue_add(h_tree *tree, h_node *node)
     //    h_node *prew = n;
     while (1)
     {
-        if ((node->weight > n->weight) && (n->right != NULL) && (n->s != -1))
+        if ((node->weight > n->weight) && (n->right != NULL) && (n->flag != -1))
         {
             // prew = n;
             n = n->right;
@@ -157,7 +158,7 @@ void queue_add(h_tree *tree, h_node *node)
                 }
             }
         }
-        else if (n->s == -1)
+        else if (n->flag == -1)
         {
             while (n->ajacent != NULL)
                 n = n->ajacent;
@@ -185,9 +186,9 @@ void queue_add(h_tree *tree, h_node *node)
         }
         else
         {
-            while ((n->left != NULL) || (n->s != -1))
+            while ((n->left != NULL) && (n->flag != -1))
                 n = n->left;
-            if (n->s == -1)
+            if (n->flag == -1)
             {
                 while (n->ajacent != NULL)
                     n = n->ajacent;
@@ -213,7 +214,7 @@ unsigned int h_tree_sift(h_tree *tree, vector_s_count **vctr_s_cnt)
     {
         h_node *node_1 = dequeue_min(tree);
         h_node *node_2 = dequeue_min(tree);
-        h_node *node = h_node_init(-1, 0);
+        h_node *node = h_node_init(0, 0, -1);
         node->left = node_2;
         node->right = node_1;
         node->weight = node_1->weight + node_2->weight;
@@ -246,7 +247,7 @@ void dequeue_code(h_tree *tree, vector_s_count **s_codes, unsigned int size)
             }
             length++;
         }
-        if (node->s != -1)
+        if (node->flag != -1)
         {
             int int_char = node->s;
             s_codes[int_char]->code = code;
@@ -262,7 +263,8 @@ void dequeue_code(h_tree *tree, vector_s_count **s_codes, unsigned int size)
     }
 }
 
-unsigned int encode_process(uint8_t *code_vector, vector *vctr, vector_s_count **s_codes)
+unsigned int encode_process(uint8_t *code_vector, vector *vctr,
+                            vector_s_count **s_codes, uint8_t *past_byte_lenght)
 {
     code_type code = 0x0;
     code_type tmp_code = 0x0;
@@ -288,7 +290,7 @@ unsigned int encode_process(uint8_t *code_vector, vector *vctr, vector_s_count *
         {
             code_vector[total_bytes] |= tmp_code;
             byte_lenght += lenght;
-            code_vector[total_bytes] <<= (8 - byte_lenght); 
+            code_vector[total_bytes] <<= (8 - byte_lenght);
         }
         else
         {
@@ -326,5 +328,6 @@ unsigned int encode_process(uint8_t *code_vector, vector *vctr, vector_s_count *
             }
         }
     }
+    *past_byte_lenght = byte_lenght;
     return total_bytes;
 }
