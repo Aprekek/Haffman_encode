@@ -1,6 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <inttypes.h>
+
+#define code_type uint16_t
+
 typedef struct
 {
     char *array;
@@ -11,7 +14,7 @@ typedef struct
 typedef struct
 {
     char symbol;
-    uint8_t code;
+    code_type code;
     unsigned int weight;
     unsigned int lenght;
 } vector_s_count;
