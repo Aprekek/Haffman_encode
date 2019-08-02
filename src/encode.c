@@ -34,8 +34,6 @@ h_node *h_node_init(char ch, unsigned int weight)
 
 void h_tree_node_add(h_tree *tree, char ch, unsigned int weight)
 {
-    if (weight == 0)
-        return;
 
     h_node *node = h_node_init(ch, weight);
 
@@ -61,17 +59,18 @@ void h_tree_node_add(h_tree *tree, char ch, unsigned int weight)
         n->right = node;
     tree->size++;
 }
-void h_tree_node_init(h_tree *tree, vector_s_count *vctr_s_cnt)
+void h_tree_node_init(h_tree *tree, vector_s_count **vctr_s_cnt)
 {
     for (unsigned int i = 0; i < symbols; i++)
     {
-        h_tree_node_add(tree, vctr_s_cnt[i].symbol, vctr_s_cnt[i].weight);
+        if (vctr_s_cnt[i]->weight != 0)
+            h_tree_node_add(tree, vctr_s_cnt[i]->symbol, vctr_s_cnt[i]->weight);
     }
 }
 
 h_node *dequeue_min(h_tree *tree)
 {
-    if (tree->size == 0)
+    if ((tree->size == 0) || (tree->head == NULL))
         return NULL;
 
     h_node *node = tree->head, *prew = NULL;
@@ -80,24 +79,29 @@ h_node *dequeue_min(h_tree *tree)
     {
         tree->head = node->right;
         tree->size--;
+        node->right = NULL;
         return node;
     }
 
     while ((node->right != NULL) || (node->left != NULL) || (node->ajacent != NULL))
     {
         prew = node;
-        if (node->left != NULL)
+        if ((node->left != NULL) && (node->s != -1))
         {
             node = node->left;
         }
+        else if ((tree->head->s == -1) || (tree->head->left == NULL))
+        {
+            tree->head = node->ajacent;
+            tree->size--;
+            node->ajacent = NULL;
+            return node;
+        }
         else
         {
-            if (prew->right == NULL)
-                tree->head = node->ajacent;
-            else
-                prew->left = node->ajacent;
-
+            tree->head->left = node->ajacent;
             tree->size--;
+            node->ajacent = NULL;
             return node;
         }
     }
@@ -105,4 +109,155 @@ h_node *dequeue_min(h_tree *tree)
     prew->left = NULL; //если левый элемент оказался наименьшим
     tree->size--;
     return node;
+}
+
+void queue_add(h_tree *tree, h_node *node)
+{
+    if (tree->size == 0)
+    {
+        tree->head = node;
+        tree->size++;
+        return;
+    }
+    h_node *n = tree->head;
+    //    h_node *prew = n;
+    while (1)
+    {
+        if ((node->weight > n->weight) && (n->right != NULL) && (n->s != -1))
+        {
+            // prew = n;
+            n = n->right;
+        }
+        else if (n->right == NULL)
+        {
+            if (node->weight >= n->weight)
+            {
+                while (n->ajacent != NULL)
+                    n = n->ajacent;
+                n->ajacent = node;
+                tree->size++;
+                return;
+            }
+            else
+            {
+                if (n->left == NULL)
+                {
+                    n->left = node;
+                    tree->size++;
+                    return;
+                }
+                else
+                {
+                    n = n->left;
+                    while (n->ajacent != NULL)
+                        n = n->ajacent;
+                    n->ajacent = node;
+                    tree->size++;
+                    return;
+                }
+            }
+        }
+        else if (n->s == -1)
+        {
+            while (n->ajacent != NULL)
+                n = n->ajacent;
+            n->ajacent = node;
+            tree->size++;
+            return;
+        }
+        else if (node->weight == n->weight)
+        {
+            if (n->left == NULL)
+            {
+                n->left = node;
+                tree->size++;
+                return;
+            }
+            else
+            {
+                n = n->left;
+                while (n->ajacent != NULL)
+                    n = n->ajacent;
+                n->ajacent = node;
+                tree->size++;
+                return;
+            }
+        }
+        else
+        {
+            while ((n->left != NULL) || (n->s != -1))
+                n = n->left;
+            if (n->s == -1)
+            {
+                while (n->ajacent != NULL)
+                    n = n->ajacent;
+                n->ajacent = node;
+                tree->size++;
+                return;
+            }
+            else
+            {
+                n->left = node;
+                tree->size++;
+                return;
+            }
+        }
+    }
+}
+
+unsigned int h_tree_sift(h_tree *tree, vector_s_count **vctr_s_cnt)
+{
+    h_tree_node_init(tree, vctr_s_cnt);
+    unsigned int size = tree->size;
+    while (tree->size > 1)
+    {
+        h_node *node_1 = dequeue_min(tree);
+        h_node *node_2 = dequeue_min(tree);
+        h_node *node = h_node_init(-1, 0);
+        node->left = node_2;
+        node->right = node_1;
+        node->weight = node_1->weight + node_2->weight;
+        queue_add(tree, node);
+    }
+    return size;
+}
+
+void dequeue_code(h_tree *tree, vector_s_count **s_codes, unsigned int size)
+{
+    uint8_t code = 0;
+    unsigned int length = 0;
+    h_node *node = NULL, *prew = NULL;
+    while (size > 0)
+    {
+        node = tree->head;
+        while ((node->left != NULL) || (node->right) != NULL)
+        {
+            prew = node;
+            if (length != 0)
+                code <<= 1;
+            if (node->left != NULL)
+            {
+                node = node->left;
+            }
+            else if (node->right != NULL)
+            {
+                node = node->right;
+                code |= 0x1;
+            }
+            length++;
+        }
+        if (node->s != -1)
+        {
+            int int_char = node->s;
+            s_codes[int_char]->code = code;
+            s_codes[int_char]->lenght = length;
+            size--;
+        }
+        if ((code & 0x1) == 0x0)
+            prew->left = NULL;
+        else
+            prew->right = NULL;
+        code = 0x0;
+        length = 0;
+    }
 }

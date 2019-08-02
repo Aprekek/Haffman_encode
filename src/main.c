@@ -22,25 +22,40 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    vector *nm_arr;
-    vector_s_count *cnt_nm_arr = malloc(sizeof(vector_s_count) * symbols);
+    vector *nm_arr = vector_init();
+    vector_s_count **cnt_nm_arr = vector_s_count_init();
+    vector_s_count **symbols_code = vector_s_count_init();
+    h_tree *tree = h_tree_init();
+    unsigned int size = 0;
 
-    nm_arr = vector_init();
-    file_works(nm_arr, cnt_nm_arr, fin); //считываем слова из файла и делаем подсчет
-    Sort(cnt_nm_arr);                    //сортируем символы по возрастанию по частоте встречаемости
+    file_read(nm_arr, cnt_nm_arr, fin);
 
-    /*    for (unsigned int i = 0; i < symbols; i++)
+    for (unsigned int i = 0; i < symbols; i++)
     {
-        if (cnt_nm_arr[i].weight != 0)
+        symbols_code[i] = cnt_nm_arr[i];
+    }
+
+    Sort(cnt_nm_arr);
+
+    size = h_tree_sift(tree, cnt_nm_arr);
+    dequeue_code(tree, symbols_code, size);
+    uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * nm_arr->size);
+
+    encode(code_vector, nm_arr, cnt_nm_arr);
+
+    for (unsigned int i = 0; i < symbols; i++)
+    {
+        if (cnt_nm_arr[i]->weight != 0)
         {
-            int x = cnt_nm_arr[i].symbol;
-            printf("[%d] %c %d\n", x, cnt_nm_arr[i].symbol, cnt_nm_arr[i].weight);
+            int x = cnt_nm_arr[i]->symbol;
+            printf("[%d] \'%c\'"
+                   "%0x %d %u\n",
+                   x, cnt_nm_arr[i]->symbol, cnt_nm_arr[i]->code,
+                   cnt_nm_arr[i]->weight, cnt_nm_arr[i]->lenght);
         }
-    }*/
-
-    /*   h_tree *tree = h_tree_init();
-    h_tree_node_init(tree, cnt_nm_arr);*/
-
+    }
+    free(tree);
+    free(symbols_code);
     free(cnt_nm_arr);
     free(nm_arr->array);
     free(nm_arr);
