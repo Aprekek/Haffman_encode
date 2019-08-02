@@ -70,9 +70,6 @@ void h_tree_node_init(h_tree *tree, vector_s_count **vctr_s_cnt)
 
 h_node *dequeue_min(h_tree *tree)
 {
-    if ((tree->size == 0) || (tree->head == NULL))
-        return NULL;
-
     h_node *node = tree->head, *prew = NULL;
 
     if ((node->left == NULL) && (node->ajacent == NULL))
@@ -288,7 +285,7 @@ unsigned int encode_process(uint8_t *code_vector, vector *vctr, vector_s_count *
         {
             code_vector[total_bytes] |= tmp_code;
             byte_lenght += lenght;
-            code_vector[total_bytes] <<= (8 - byte_lenght); 
+            code_vector[total_bytes] <<= (8 - byte_lenght);
         }
         else
         {
