@@ -1,108 +1,127 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "include/file.h"
 #include "include/types.h"
+#include "include/vector.h"
+#include "include/vector_s_count.h"
+#include "include/node_h_tree.h"
 #include "include/encode.h"
 
 extern size_t symbols;
 
-h_tree *h_tree_init()
+void encode(char *name_fin, char *name_fout)
 {
-    h_tree *tree = malloc(sizeof(*tree));
-    if (tree != NULL)
+    FILE *fin, *fout;
+    if ((fin = fopen(name_fin, "r")) == NULL)
     {
-        tree->size = 0;
-        tree->head = NULL;
+        exit(EXIT_FAILURE);
     }
-    return tree;
-}
-
-h_node *h_node_init(char ch, unsigned int weight)
-{
-    h_node *node = malloc(sizeof(*node));
-    if (node != NULL)
+    if ((fout = fopen(name_fout, "wb")) == NULL)
     {
-        node->weight = weight;
-        node->s = ch;
-        node->ajacent = NULL; //когда созданный узел получился с самым большим или равным
-                              // весом и добавление следующих узлов больше него
-                              //происходят по этому указателю
-        node->left = NULL;
-        node->right = NULL;
-    }
-    return node;
-}
-
-void h_tree_node_add(h_tree *tree, char ch, unsigned int weight)
-{
-    if (weight == 0)
-        return;
-
-    h_node *node = h_node_init(ch, weight);
-
-    if (tree->head == NULL)
-    {
-        tree->head = node;
-        tree->size++;
-        return;
+        fclose(fin);
+        exit(EXIT_FAILURE);
     }
 
-    h_node *n = tree->head;
+    vector *symbols_arr = vector_init();
+    vector_s_count **cnt_symbols_arr = vector_s_count_init();
+    vector_s_count **symbols_code = vector_s_count_init();
+    h_tree *tree = h_tree_init();
+    unsigned int size = 0;
 
-    while (n->right != NULL)
-        n = n->right;
+    file_read(symbols_arr, cnt_symbols_arr, fin);
 
-    if (node->weight == n->weight)
-    {
-        while (n->left != NULL)
-            n = n->left;
-        n->left = node;
-    }
-    else
-        n->right = node;
-    tree->size++;
-}
-void h_tree_node_init(h_tree *tree, vector_s_count *vctr_s_cnt)
-{
     for (unsigned int i = 0; i < symbols; i++)
     {
-        h_tree_node_add(tree, vctr_s_cnt[i].symbol, vctr_s_cnt[i].weight);
+        symbols_code[i] = cnt_symbols_arr[i];
     }
+
+    Sort(cnt_symbols_arr);
+
+    size = h_tree_sift(tree, cnt_symbols_arr);
+    extraction_code(tree, symbols_code, size);
+
+    uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * symbols_arr->size);
+    uint8_t past_byte_lenght = 0;
+    uint32_t total_bytes = encode_process(code_vector, symbols_arr, symbols_code, &past_byte_lenght);
+
+    fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
+
+    free(code_vector);
+    free(tree);
+    free(symbols_code);
+    free(cnt_symbols_arr);
+    free(symbols_arr->array);
+    free(symbols_arr);
+    fclose(fin);
+    fclose(fout);
+    return;
 }
 
-h_node *dequeue_min(h_tree *tree)
+unsigned int encode_process(uint8_t *code_vector, vector *vctr,
+                            vector_s_count **s_codes, uint8_t *past_byte_lenght)
 {
-    if (tree->size == 0)
-        return NULL;
+    code_type code = 0x0;
+    code_type tmp_code = 0x0;
+    char lenght = 0;
+    char byte_lenght = 0;
+    unsigned int total_bytes = 0;
+    unsigned int ch_int;
+    char old_lenght;
 
-    h_node *node = tree->head, *prew = NULL;
-
-    if ((node->left == NULL) && (node->ajacent == NULL))
+    for (unsigned int i = 0; i < vctr->size; i++)
     {
-        tree->head = node->right;
-        tree->size--;
-        return node;
-    }
-
-    while ((node->right != NULL) || (node->left != NULL) || (node->ajacent != NULL))
-    {
-        prew = node;
-        if (node->left != NULL)
+        if (byte_lenght == 8)
         {
-            node = node->left;
+            byte_lenght = 0;
+            total_bytes++;
+        }
+
+        ch_int = vctr->array[i];
+        tmp_code = s_codes[ch_int]->code;
+        lenght = s_codes[ch_int]->lenght;
+
+        if (byte_lenght + lenght <= 8)
+        {
+            code_vector[total_bytes] |= tmp_code;
+            byte_lenght += lenght;
+            code_vector[total_bytes] <<= (8 - byte_lenght);
         }
         else
         {
-            if (prew->right == NULL)
-                tree->head = node->ajacent;
-            else
-                prew->left = node->ajacent;
+            while (lenght > 0)
+            {
+                if (byte_lenght == 8)
+                {
+                    byte_lenght = 0;
+                    total_bytes++;
+                }
 
-            tree->size--;
-            return node;
+                code = tmp_code;
+                old_lenght = lenght;
+                lenght = lenght - (8 - byte_lenght);
+
+                if (lenght >= 0)
+                {
+                    tmp_code >>= lenght;
+                    byte_lenght += old_lenght - lenght;
+                }
+
+                code_vector[total_bytes] |= tmp_code;
+
+                if (lenght < 0)
+                {
+                    code_vector[total_bytes] <<= (abs(lenght));
+                    byte_lenght = old_lenght;
+                }
+
+                if (lenght > 0)
+                {
+                    tmp_code = code << (sizeof(code_type) * 8 - lenght);
+                    tmp_code >>= sizeof(code_type) * 8 - lenght;
+                }
+            }
         }
     }
-
-    prew->left = NULL; //если левый элемент оказался наименьшим
-    tree->size--;
-    return node;
+    *past_byte_lenght = byte_lenght;
+    return total_bytes;
 }

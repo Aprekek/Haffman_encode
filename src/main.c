@@ -1,50 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "include/encode.h"
-#include "include/file.h"
-#include "include/types.h"
-#include "include/vector.h"
-#include "include/vector_s_count.h"
 
 size_t capacity = 1000;
-size_t symbols = 128;
+size_t symbols = 256;
 
-int main()
+int main(int argc, char *argv[])
 {
-    FILE *fin, *fout;
-    if ((fin = fopen("symbols.txt", "r")) == NULL)
+
+    char choice;
+    if (argc < 2)
     {
-        exit(EXIT_FAILURE);
+        printf("syntax: <path_to_the_file> <encode/decode> <input_file> <output_file>\n");
+        return 0;
     }
-    if ((fout = fopen("symbols_binary.txt", "wb")) == NULL)
+    if (strcmp(argv[1], "encode") == 0)
+        choice = 1;
+    else if (strcmp(argv[1], "decode") == 0)
+        choice = 2;
+    else
+        choice = -1;
+
+    switch (choice)
     {
-        fclose(fin);
-        exit(EXIT_FAILURE);
+    case 1:
+        encode(argv[2], argv[3]);
+        break;
+
+    case 2:
+        break;
+
+    default:
+        printf("syntax: <path_to_the_file> <encode/decode> <input_file> <output_file>\n");
+        break;
     }
 
-    vector *nm_arr;
-    vector_s_count *cnt_nm_arr = malloc(sizeof(vector_s_count) * symbols);
-
-    nm_arr = vector_init();
-    file_works(nm_arr, cnt_nm_arr, fin); //считываем слова из файла и делаем подсчет
-    Sort(cnt_nm_arr);                    //сортируем символы по возрастанию по частоте встречаемости
-
-    /*    for (unsigned int i = 0; i < symbols; i++)
-    {
-        if (cnt_nm_arr[i].weight != 0)
-        {
-            int x = cnt_nm_arr[i].symbol;
-            printf("[%d] %c %d\n", x, cnt_nm_arr[i].symbol, cnt_nm_arr[i].weight);
-        }
-    }*/
-
-    /*   h_tree *tree = h_tree_init();
-    h_tree_node_init(tree, cnt_nm_arr);*/
-
-    free(cnt_nm_arr);
-    free(nm_arr->array);
-    free(nm_arr);
-    fclose(fin);
-    fclose(fout);
     return 0;
 }

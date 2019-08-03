@@ -1,5 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
+#include <inttypes.h>
+
+#define code_type uint16_t
+#define __size_smbls uint8_t
 
 typedef struct
 {
@@ -10,8 +14,10 @@ typedef struct
 
 typedef struct
 {
+    __size_smbls symbol;
+    code_type code;
     unsigned int weight;
-    char symbol;
+    uint8_t lenght;
 } vector_s_count;
 
 typedef struct h_node h_node;
@@ -19,7 +25,8 @@ typedef struct h_node h_node;
 struct h_node
 {
     unsigned int weight;
-    char s;
+    __size_smbls s;
+    char flag;
     h_node *ajacent;
     h_node *left;
     h_node *right;
