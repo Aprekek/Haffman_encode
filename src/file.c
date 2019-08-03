@@ -4,6 +4,7 @@
 #include "include/types.h"
 #include "include/vector.h"
 #include "include/vector_s_count.h"
+#include "include/node_h_tree.h"
 
 extern size_t symbols;
 
