@@ -2,7 +2,8 @@
 *~
 *.swp
 *#
+files
 bin
 build
 dep
-*.txt
+
