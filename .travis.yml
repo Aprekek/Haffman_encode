@@ -4,5 +4,5 @@ os: linux
 compiler: gcc
 script:
   - git ls-files src/ | xargs clang-format -i && git diff --exit-code
-  - make
-  - ./bin/test
+  - make test
+  - ./bin/bin/test
