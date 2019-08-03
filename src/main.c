@@ -1,6 +1,3 @@
-// переменные типа char в структурах могут не корректно вести себя
-// если пытаться считать символы из второй части ascii.
-// unsigned char???
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
