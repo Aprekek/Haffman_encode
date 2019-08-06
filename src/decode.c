@@ -21,6 +21,7 @@ void decode(char *name_fin, char *name_fout)
         printf("Не удалось открыть файл %d\n", *name_fout);
         exit(EXIT_FAILURE);
     }
+    
     uint8_t past_total_byte;
     __size_smbls count;
     fread(&count, sizeof(__size_smbls), 1, fin);
@@ -28,7 +29,6 @@ void decode(char *name_fin, char *name_fout)
     s_node **c_symbols = s_node_itit(count);
     if (c_symbols == NULL)
     {
-        printf("fc\n");
         exit(EXIT_FAILURE);
     }
 

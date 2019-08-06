@@ -59,8 +59,6 @@ uint8_t *fread_s_codes(s_node **c_symbols, __size_smbls count, uint8_t *past_tot
     uint8_t *encode_message = (uint8_t *)malloc(sizeof(encode_message) * sizeof_message);
     if (encode_message == NULL)
     {
-        printf("fr\n");
-        printf("%0lx\n", sizeof_message);
         exit(EXIT_FAILURE);
     }
     fread(encode_message, sizeof(uint8_t), sizeof_message, fin);
