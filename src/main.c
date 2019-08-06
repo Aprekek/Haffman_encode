@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "include/encode.h"
+#include "include/decode.h"
 
 size_t capacity = 1000;
 size_t symbols = 256;
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
         break;
 
     case 2:
+        decode(argv[2], argv[3]);
         break;
 
     default:
@@ -36,5 +38,5 @@ int main(int argc, char *argv[])
         break;
     }
 
-    return 0;
+    exit(EXIT_SUCCESS);
 }

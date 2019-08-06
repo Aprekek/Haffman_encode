@@ -31,9 +31,18 @@ struct h_node
     h_node *left;
     h_node *right;
 };
+
 typedef struct
 {
     unsigned int size;
     h_node *head;
 } h_tree;
+
+typedef struct
+{
+    uint8_t symbol;
+    uint8_t lenght;
+    uint16_t code;
+} s_node;
+
 #endif
