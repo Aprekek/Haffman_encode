@@ -6,7 +6,7 @@
 #include "include/vector_s_count.h"
 #include "include/h_node_h_tree.h"
 #include "include/decode.h"
-#include "include/node.h"
+#include "include/s_node.h"
 
 void decode(char *name_fin, char *name_fout)
 {
@@ -25,7 +25,7 @@ void decode(char *name_fin, char *name_fout)
     __size_smbls count;
     fread(&count, sizeof(__size_smbls), 1, fin);
 
-    s_node **c_symbols = node_itit(count);
+    s_node **c_symbols = s_node_itit(count);
     if (c_symbols == NULL)
     {
         printf("fc\n");

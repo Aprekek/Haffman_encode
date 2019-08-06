@@ -2,7 +2,7 @@
 .PHONY: clean
 .PHONY: all
 CC = gcc -g3 -O0 
-CFLAGS = -Wall -Wextra -Werror -Wshadow
+CFLAGS = -Wall -Wextra -Wshadow #-Werror -Wshadow
 DEPFLAGS = -MP -MMD 
 DEPDIR = dep/main/
 OBJDIR = build/main/

@@ -38,11 +38,22 @@ typedef struct
     h_node *head;
 } h_tree;
 
-typedef struct
+typedef struct s_node s_node;
+
+struct s_node
 {
     uint8_t symbol;
     uint8_t lenght;
     uint16_t code;
-} s_node;
+    s_node *ajacent;
+    s_node *left;
+    s_node *right;
+};
+
+typedef struct
+{
+    unsigned int size;
+    s_node *head;
+} s_tree;
 
 #endif

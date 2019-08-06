@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/types.h"
-#include "include/node.h"
+#include "include/s_node.h"
 
 s_node **node_itit(__size_smbls count)
 {
