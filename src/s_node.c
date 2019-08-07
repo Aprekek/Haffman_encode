@@ -43,25 +43,20 @@ void s_node_sort(s_node **node, __size_smbls count)
             }
 }
 
-void s_tree_node_add(s_node *tree, s_node **node, __size_smbls count)
+void s_tree_node_add(s_node **tree, s_node **node, __size_smbls count)
 {
     __size_smbls mid = (count / 2);
 
-    s_node_add(tree, node[mid]);
+    *tree = node[mid];
 
     for (__size_smbls i = 0; i < mid; i++)
-        s_node_add(tree, node[i]);
+        s_node_add(*tree, node[i]);
     for (__size_smbls i = mid + 1; i < count; i++)
-        s_node_add(tree, node[i]);
+        s_node_add(*tree, node[i]);
 }
 
 void s_node_add(s_node *tree, s_node *node)
 {
-    if (tree == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-
     s_node *prew;
 
     while (tree != NULL)

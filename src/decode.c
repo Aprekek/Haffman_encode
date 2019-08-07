@@ -21,7 +21,7 @@ void decode(char *name_fin, char *name_fout)
         printf("Не удалось открыть файл %d\n", *name_fout);
         exit(EXIT_FAILURE);
     }
-    
+
     uint8_t past_total_byte;
     __size_smbls count;
     fread(&count, sizeof(__size_smbls), 1, fin);
@@ -33,8 +33,6 @@ void decode(char *name_fin, char *name_fout)
     }
 
     uint8_t *encode_message = fread_s_codes(c_symbols, count, &past_total_byte, fin);
-    for (unsigned i = 0; i < count; i++)
-        printf("%c [%d] - %0x\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
 
     fclose(fin);
     fclose(fout);
