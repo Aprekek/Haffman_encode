@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    char *array;
+    __size_smbls *array;
     unsigned int size;
     unsigned int capacity;
 } vector;
