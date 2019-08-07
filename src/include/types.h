@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    char *array;
+    __size_smbls *array;
     unsigned int size;
     unsigned int capacity;
 } vector;
@@ -49,11 +49,5 @@ struct s_node
     s_node *left;
     s_node *right;
 };
-
-typedef struct
-{
-    unsigned int size;
-    s_node *head;
-} s_tree;
 
 #endif
