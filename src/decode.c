@@ -22,20 +22,24 @@ void decode(char *name_fin, char *name_fout)
         exit(EXIT_FAILURE);
     }
 
+    uint64_t sizeof_message;
     uint8_t past_total_byte;
     __size_smbls count;
     fread(&count, sizeof(__size_smbls), 1, fin);
     printf("total symbols %d\n", count);
 
+    s_node *tree = NULL;
     s_node **c_symbols = s_node_itit(count);
     if (c_symbols == NULL)
     {
         exit(EXIT_FAILURE);
     }
 
-    uint8_t *encode_message = fread_s_codes(c_symbols, count, &past_total_byte, fin);
-    /* some ..
-    ..code */
+    uint8_t *encode_message = fread_s_codes(c_symbols, count, &past_total_byte, &sizeof_message, fin);
+    vector *decode_message = vector_init(count);
+    s_node_sort(c_symbols, count);
+    s_tree_node_add(&tree, c_symbols, count);
+    decode_process(tree, encode_message, decode_message, past_total_byte, sizeof_message);
     fclose(fin);
     fclose(fout);
     free(c_symbols);
