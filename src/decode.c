@@ -35,15 +35,29 @@ void decode(char *name_fin, char *name_fout)
         exit(EXIT_FAILURE);
     }
 
-    uint8_t *encode_message = fread_s_codes(c_symbols, count, &past_total_byte, &sizeof_message, fin);
-    vector *decode_message = vector_init(count);
+    for (uint8_t i = 0; i < count; i++)
+    {
+        fread(&c_symbols[i]->symbol, sizeof(__size_smbls), 1, fin);
+        fread(&c_symbols[i]->lenght, sizeof(uint8_t), 1, fin);
+        fread(&c_symbols[i]->code, sizeof(code_type), 1, fin);
+        printf("%c %d %d\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
+    }
+    fread(&sizeof_message, sizeof(uint64_t), 1, fin);
+    printf("size of message %ld\n", sizeof_message);
+    fread(&past_total_byte, sizeof(__size_smbls), 1, fin);
+    printf("past total byte %d\n", past_total_byte);
+    uint8_t encode_message[sizeof_message + 1];
+
+    printf("%ld\n", fread(encode_message, sizeof(uint8_t), sizeof_message, fin));
+
+    /*    vector *decode_message = vector_init(count);
+
     s_node_sort(c_symbols, count);
     s_tree_node_add(&tree, c_symbols, count);
-    decode_process(tree, encode_message, decode_message, past_total_byte, sizeof_message);
+    decode_process(tree, encode_message, decode_message, past_total_byte, sizeof_message); */
     fclose(fin);
     fclose(fout);
     free(c_symbols);
-    free(encode_message);
     return;
 }
 void decode_process(s_node *tree, uint8_t *encode_message, vector *decode_message,
