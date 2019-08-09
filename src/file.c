@@ -45,29 +45,3 @@ void fwrite_s_codes(vector_s_count **codes_array, uint8_t *encode_vector,
     fwrite(&past_byte_leght, sizeof(__size_smbls), 1, fout);
     printf("fwrite message bytes %ld\n", fwrite(encode_vector, sizeof(uint8_t), total_bytes, fout));
 }
-
-uint8_t *fread_s_codes(s_node **c_symbols, __size_smbls count, uint8_t *past_total_byte,
-                       uint64_t *sizeof_message,
-                       FILE *fin)
-{
-    printf("total simbols: %d\n", count);
-    for (size_t i = 0; i < count; i++)
-    {
-        fread(&c_symbols[i]->symbol, sizeof(__size_smbls), 1, fin);
-        fread(&c_symbols[i]->lenght, sizeof(uint8_t), 1, fin);
-        fread(&c_symbols[i]->code, sizeof(code_type), 1, fin);
-        printf("%c %d %d\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
-    }
-    fread(sizeof_message, sizeof(uint64_t), 1, fin);
-    printf("size of message %ld\n", *sizeof_message);
-    fread(&(*past_total_byte), sizeof(__size_smbls), 1, fin);
-    printf("past total byte %d\n", *past_total_byte);
-    uint8_t *encode_message = (uint8_t *)malloc(sizeof(encode_message) * (*sizeof_message));
-    if (encode_message == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    printf("%ld\n", fread(encode_message, sizeof(uint8_t), *sizeof_message, fin));
-
-    return encode_message;
-}

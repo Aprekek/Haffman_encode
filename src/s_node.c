@@ -3,29 +3,21 @@
 #include "include/types.h"
 #include "include/s_node.h"
 
-s_node *sNode_init(__size_smbls symbol, uint8_t lenght, code_type code)
-{
-    s_node *n = (s_node *)malloc(sizeof(n));
-    if (n != NULL)
-    {
-        n->symbol = symbol;
-        n->lenght = lenght;
-        n->code = code;
-        n->left = NULL;
-        n->right = NULL;
-        n->ajacent = NULL;
-    }
-    return n;
-}
-
 s_node **s_node_itit(__size_smbls count)
 {
     s_node **n = (s_node **)malloc(sizeof(*n) * count);
+    for (unsigned int i = 0; i < count; i++)
+        n[i] = (s_node *)malloc(sizeof(n));
     if (n != NULL)
     {
         for (unsigned int i = 0; i < count; i++)
         {
-            n[i] = sNode_init(0, 0, 0);
+            n[i]->symbol = 0;
+            n[i]->code = 0;
+            n[i]->lenght = 0;
+            n[i]->left = NULL;
+            n[i]->right = NULL;
+            n[i]->ajacent = NULL;
         }
     }
     return n;
