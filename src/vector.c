@@ -7,12 +7,12 @@ extern size_t capacity;
 
 vector *vector_init()
 {
-    vector *v = malloc(sizeof(*v));
+    vector *v = (vector *)malloc(sizeof(*v));
     if (v != NULL)
     {
         v->capacity = capacity;
         v->size = 0;
-        v->array = malloc(capacity * sizeof(char));
+        v->array = (__size_smbls *)malloc(capacity * sizeof(__size_smbls));
         if (v->array == NULL)
         {
             free(v);
@@ -39,7 +39,7 @@ int vector_push_back(vector *v, char item)
     }
     else
     {
-        __size_smbls *helper = realloc(v->array, 2 * v->capacity * sizeof(__size_smbls));
+        __size_smbls *helper = (__size_smbls *)realloc(v->array, 2 * v->capacity * sizeof(__size_smbls));
         if (helper == NULL)
             return -1;
         v->array = helper;
