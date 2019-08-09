@@ -39,7 +39,7 @@ int vector_push_back(vector *v, char item)
     }
     else
     {
-        char *helper = realloc(v->array, 2 * v->capacity * sizeof(char));
+        __size_smbls *helper = realloc(v->array, 2 * v->capacity * sizeof(__size_smbls));
         if (helper == NULL)
             return -1;
         v->array = helper;

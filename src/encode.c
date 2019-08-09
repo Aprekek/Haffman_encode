@@ -14,12 +14,12 @@ void encode(char *name_fin, char *name_fout)
     FILE *fin, *fout;
     if ((fin = fopen(name_fin, "r")) == NULL)
     {
-	printf("Не удалось открыть файл %d\n", *name_fin);
+        printf("Не удалось открыть файл %d\n", *name_fin);
         exit(EXIT_FAILURE);
     }
     if ((fout = fopen(name_fout, "wb")) == NULL)
     {
-	printf("Не удалось открыть файл %d\n", *name_fout);
+        printf("Не удалось открыть файл %d\n", *name_fout);
         exit(EXIT_FAILURE);
     }
 
@@ -64,7 +64,12 @@ void encode(char *name_fin, char *name_fout)
     }
     uint8_t past_byte_lenght = 0;
     uint64_t total_bytes = encode_process(code_vector, symbols_arr, symbols_code, &past_byte_lenght);
-
+    for (size_t i = 0; i < symbols; i++)
+    {
+        if (symbols_code[i]->weight != 0)
+            printf("%c %d %d\n", symbols_code[i]->symbol, symbols_code[i]->lenght,
+                   symbols_code[i]->code);
+    }
     fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
 
     free(code_vector);
