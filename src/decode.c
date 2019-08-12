@@ -50,18 +50,22 @@ void decode(char *name_fin, char *name_fout)
 
     printf("fread message bytes %ld\n", fread(encode_message, sizeof(uint8_t), sizeof_encode_message / 8 + 1, fin));
 
-    uint8_t decode_message[sizeof_decode_message];
+    char decode_message[sizeof_decode_message];
 
     s_node_sort(c_symbols, count);
     s_tree_node_add(&tree, c_symbols, count);
+
     decode_process(tree, encode_message, decode_message, sizeof_encode_message);
 
+    printf("\n----------\n%s\n----------\n", decode_message);
+    //на моем компьютере происходит аварийная остановка при вызове низлежащей функции
+    //fwrite_decode_message(decode_message, fout);
     fclose(fin);
     fclose(fout);
     free(c_symbols);
     return;
 }
-void decode_process(s_node *tree, uint8_t *encode_message, uint8_t *decode_message,
+void decode_process(s_node *tree, uint8_t *encode_message, char *decode_message,
                     uint64_t sizeof_encode_message)
 {
     uint64_t byte = 0;
@@ -97,6 +101,5 @@ void decode_process(s_node *tree, uint8_t *encode_message, uint8_t *decode_messa
         decode_message[decode_message_possition] = symbol;
         decode_message_possition++;
     }
-    for (uint64_t i = 0; i < decode_message_possition; i++)
-        printf("%c", decode_message[i]);
+    decode_message[decode_message_possition] = '\0';
 }

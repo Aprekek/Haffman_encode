@@ -45,3 +45,8 @@ void fwrite_s_codes(vector_s_count **codes_array, uint8_t *encode_vector,
 
     printf("fwrite message bytes %ld\n", fwrite(encode_vector, sizeof(uint8_t), total_bist / 8 + 1, fout));
 }
+
+void fwrite_decode_message(char *decode_message, FILE *fout)
+{
+    fprintf(fout, "%s", decode_message);
+}
