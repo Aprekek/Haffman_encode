@@ -7,7 +7,31 @@
 size_t capacity = 1000;
 size_t symbols = 256;
 
-int main(int argc, char *argv[])
+int main()
+{
+    // char *fin = "files/symbols.txt";
+    char *fin = "files/symbols_binary.txt";
+    char *fout = "files/symbols_decode.txt";
+    char choice = 2;
+
+    switch (choice)
+    {
+    case 1:
+        encode(fin, fout);
+        break;
+
+    case 2:
+        decode(fin, fout);
+        break;
+
+    default:
+        printf("syntax: <path_to_the_file> <encode/decode> <input_file> <output_file>\n");
+        break;
+    }
+
+    exit(EXIT_SUCCESS);
+}
+/*int main(int argc, char *argv[])
 {
 
     char choice;
@@ -39,4 +63,4 @@ int main(int argc, char *argv[])
     }
 
     exit(EXIT_SUCCESS);
-}
+}*/

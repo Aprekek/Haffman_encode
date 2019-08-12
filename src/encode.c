@@ -62,16 +62,14 @@ void encode(char *name_fin, char *name_fout)
     {
         exit(EXIT_FAILURE);
     }
-    uint8_t past_byte_lenght = 0;
-    uint64_t total_bytes = encode_process(code_vector, symbols_arr, symbols_code, &past_byte_lenght);
+    uint64_t total_bits = encode_process(code_vector, symbols_arr, symbols_code);
     for (size_t i = 0; i < symbols; i++)
     {
         if (symbols_code[i]->weight != 0)
-            printf("%c %d %d\n", symbols_code[i]->symbol, symbols_code[i]->lenght,
+            printf("%c %0x %0x\n", symbols_code[i]->symbol, symbols_code[i]->lenght,
                    symbols_code[i]->code);
     }
-    fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
-
+    fwrite_s_codes(symbols_code, code_vector, size, symbols_arr->size, total_bits, fout);
     free(code_vector);
     free(tree);
     free(symbols_code);
@@ -84,7 +82,7 @@ void encode(char *name_fin, char *name_fout)
 }
 
 uint64_t encode_process(uint8_t *code_vector, vector *vctr,
-                        vector_s_count **s_codes, uint8_t *past_byte_lenght)
+                        vector_s_count **s_codes)
 {
     code_type code = 0x0;
     code_type tmp_code = 0x0;
@@ -108,9 +106,9 @@ uint64_t encode_process(uint8_t *code_vector, vector *vctr,
 
         if (byte_lenght + lenght <= 8)
         {
-            code_vector[total_bytes] |= tmp_code;
             byte_lenght += lenght;
-            code_vector[total_bytes] <<= (8 - byte_lenght);
+            tmp_code <<= (8 - byte_lenght);
+            code_vector[total_bytes] |= tmp_code;
         }
         else
         {
@@ -148,6 +146,5 @@ uint64_t encode_process(uint8_t *code_vector, vector *vctr,
             }
         }
     }
-    *past_byte_lenght = byte_lenght;
-    return total_bytes;
+    return (total_bytes - 1) * 8 + byte_lenght;
 }

@@ -8,8 +8,8 @@
 typedef struct
 {
     __size_smbls *array;
-    unsigned int size;
-    unsigned int capacity;
+    uint64_t size;
+    uint64_t capacity;
 } vector;
 
 typedef struct

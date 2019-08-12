@@ -68,7 +68,7 @@ void s_node_add(s_node *tree, s_node *node)
     else if (node->lenght == prew->lenght)
         prew->ajacent = node;
     else
-        prew->ajacent = node;
+        prew->left = node;
 }
 
 int search_symbol(s_node *tree, code_type code, uint8_t lenght)
@@ -81,7 +81,7 @@ int search_symbol(s_node *tree, code_type code, uint8_t lenght)
             tree = tree->left;
         else if (lenght > tree->lenght)
             tree = tree->right;
-        else if ((lenght == tree->lenght) || (code == tree->code))
+        else if ((lenght == tree->lenght) && (code == tree->code))
         {
             flag = 0;
             symbol = tree->symbol;
