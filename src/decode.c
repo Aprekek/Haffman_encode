@@ -22,8 +22,8 @@ void decode(char *name_fin, char *name_fout)
         exit(EXIT_FAILURE);
     }
 
-    uint64_t sizeof_message;
-    uint8_t past_total_byte;
+    uint64_t sizeof_encode_message;
+    uint64_t sizeof_decode_message;
     __size_smbls count;
     fread(&count, sizeof(__size_smbls), 1, fin);
     printf("total symbols %d\n", count);
@@ -40,38 +40,39 @@ void decode(char *name_fin, char *name_fout)
         fread(&c_symbols[i]->symbol, sizeof(__size_smbls), 1, fin);
         fread(&c_symbols[i]->lenght, sizeof(uint8_t), 1, fin);
         fread(&c_symbols[i]->code, sizeof(code_type), 1, fin);
-        printf("%c %d %d\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
+        printf("%c %0x %0x\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
     }
-    fread(&sizeof_message, sizeof(uint64_t), 1, fin);
-    printf("size of message %ld\n", sizeof_message);
-    fread(&past_total_byte, sizeof(__size_smbls), 1, fin);
-    printf("past total byte %d\n", past_total_byte);
-    uint8_t encode_message[sizeof_message + 1];
+    fread(&sizeof_decode_message, sizeof(uint64_t), 1, fin);
+    printf("decode message lenght %ld\n", sizeof_decode_message);
+    fread(&sizeof_encode_message, sizeof(uint64_t), 1, fin);
+    printf("encode message lenght %ld\n", sizeof_encode_message);
+    uint8_t encode_message[sizeof_encode_message / 8 + 1];
 
-    printf("%ld\n", fread(encode_message, sizeof(uint8_t), sizeof_message, fin));
+    printf("fread message bytes %ld\n", fread(encode_message, sizeof(uint8_t), sizeof_encode_message / 8 + 1, fin));
 
-    /*    vector *decode_message = vector_init(count);
+    uint8_t decode_message[sizeof_decode_message];
 
     s_node_sort(c_symbols, count);
     s_tree_node_add(&tree, c_symbols, count);
-    decode_process(tree, encode_message, decode_message, past_total_byte, sizeof_message); */
+    decode_process(tree, encode_message, decode_message, sizeof_encode_message);
+
     fclose(fin);
     fclose(fout);
     free(c_symbols);
     return;
 }
-void decode_process(s_node *tree, uint8_t *encode_message, vector *decode_message,
-                    uint8_t past_byte_lenght, uint64_t sizeof_message)
+void decode_process(s_node *tree, uint8_t *encode_message, uint8_t *decode_message,
+                    uint64_t sizeof_encode_message)
 {
-
-    uint8_t lenght;
-    int symbol;
-    uint64_t total_bits = 0;
     uint64_t byte = 0;
-    code_type code = encode_message[byte];
+    int symbol;
+    uint8_t lenght;
+    uint8_t code = encode_message[byte];
     code_type tmp_code;
+    uint64_t total_bits = 0;
     uint8_t bit;
-    while (total_bits < (8 * sizeof_message + past_byte_lenght))
+    uint64_t decode_message_possition = 0;
+    while (total_bits < sizeof_encode_message)
     {
         tmp_code = 0;
         lenght = 0;
@@ -93,7 +94,9 @@ void decode_process(s_node *tree, uint8_t *encode_message, vector *decode_messag
             lenght++;
 
         } while ((symbol = search_symbol(tree, tmp_code, lenght)) == -1);
-        vector_push_back(decode_message, (__size_smbls)symbol);
+        decode_message[decode_message_possition] = symbol;
+        decode_message_possition++;
     }
-    printf("%s", decode_message->array);
+    for (uint64_t i = 0; i < decode_message_possition; i++)
+        printf("%c", decode_message[i]);
 }
