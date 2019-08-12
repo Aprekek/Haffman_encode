@@ -4,7 +4,7 @@
 #include "include/types.h"
 #include "include/vector.h"
 #include "include/vector_s_count.h"
-#include "include/node_h_tree.h"
+#include "include/h_node_h_tree.h"
 #include "include/encode.h"
 
 extern size_t symbols;
@@ -14,18 +14,35 @@ void encode(char *name_fin, char *name_fout)
     FILE *fin, *fout;
     if ((fin = fopen(name_fin, "r")) == NULL)
     {
+        printf("Не удалось открыть файл %d\n", *name_fin);
         exit(EXIT_FAILURE);
     }
     if ((fout = fopen(name_fout, "wb")) == NULL)
     {
-        fclose(fin);
+        printf("Не удалось открыть файл %d\n", *name_fout);
         exit(EXIT_FAILURE);
     }
 
     vector *symbols_arr = vector_init();
+    if (symbols_arr == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
     vector_s_count **cnt_symbols_arr = vector_s_count_init();
+    if (cnt_symbols_arr == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
     vector_s_count **symbols_code = vector_s_count_init();
+    if (symbols_code == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
     h_tree *tree = h_tree_init();
+    if (tree == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
     unsigned int size = 0;
 
     file_read(symbols_arr, cnt_symbols_arr, fin);
@@ -41,11 +58,18 @@ void encode(char *name_fin, char *name_fout)
     extraction_code(tree, symbols_code, size);
 
     uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * symbols_arr->size);
-    uint8_t past_byte_lenght = 0;
-    uint32_t total_bytes = encode_process(code_vector, symbols_arr, symbols_code, &past_byte_lenght);
-
-    fwrite_s_codes(symbols_code, code_vector, size, past_byte_lenght, total_bytes, fout);
-
+    if (code_vector == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+    uint64_t total_bits = encode_process(code_vector, symbols_arr, symbols_code);
+    for (size_t i = 0; i < symbols; i++)
+    {
+        if (symbols_code[i]->weight != 0)
+            printf("%c %0x %0x\n", symbols_code[i]->symbol, symbols_code[i]->lenght,
+                   symbols_code[i]->code);
+    }
+    fwrite_s_codes(symbols_code, code_vector, size, symbols_arr->size, total_bits, fout);
     free(code_vector);
     free(tree);
     free(symbols_code);
@@ -57,14 +81,14 @@ void encode(char *name_fin, char *name_fout)
     return;
 }
 
-unsigned int encode_process(uint8_t *code_vector, vector *vctr,
-                            vector_s_count **s_codes, uint8_t *past_byte_lenght)
+uint64_t encode_process(uint8_t *code_vector, vector *vctr,
+                        vector_s_count **s_codes)
 {
     code_type code = 0x0;
     code_type tmp_code = 0x0;
     char lenght = 0;
     char byte_lenght = 0;
-    unsigned int total_bytes = 0;
+    uint64_t total_bytes = 0;
     unsigned int ch_int;
     char old_lenght;
 
@@ -82,9 +106,9 @@ unsigned int encode_process(uint8_t *code_vector, vector *vctr,
 
         if (byte_lenght + lenght <= 8)
         {
-            code_vector[total_bytes] |= tmp_code;
             byte_lenght += lenght;
-            code_vector[total_bytes] <<= (8 - byte_lenght);
+            tmp_code <<= (8 - byte_lenght);
+            code_vector[total_bytes] |= tmp_code;
         }
         else
         {
@@ -122,6 +146,5 @@ unsigned int encode_process(uint8_t *code_vector, vector *vctr,
             }
         }
     }
-    *past_byte_lenght = byte_lenght;
-    return total_bytes;
+    return (total_bytes - 1) * 8 + byte_lenght;
 }

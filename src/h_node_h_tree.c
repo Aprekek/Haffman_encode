@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/types.h"
-#include "include/node_h_tree.h"
+#include "include/h_node_h_tree.h"
 
 extern size_t symbols;
 
@@ -37,6 +37,10 @@ void h_tree_node_add(h_tree *tree, __size_smbls ch, unsigned int weight)
 {
 
     h_node *node = h_node_init(ch, weight, 0);
+    if (node == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
 
     if (tree->head == NULL)
     {

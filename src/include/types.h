@@ -7,9 +7,9 @@
 
 typedef struct
 {
-    char *array;
-    unsigned int size;
-    unsigned int capacity;
+    __size_smbls *array;
+    uint64_t size;
+    uint64_t capacity;
 } vector;
 
 typedef struct
@@ -31,9 +31,23 @@ struct h_node
     h_node *left;
     h_node *right;
 };
+
 typedef struct
 {
     unsigned int size;
     h_node *head;
 } h_tree;
+
+typedef struct s_node s_node;
+
+struct s_node
+{
+    uint8_t symbol;
+    uint8_t lenght;
+    uint16_t code;
+    s_node *ajacent;
+    s_node *left;
+    s_node *right;
+};
+
 #endif

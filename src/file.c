@@ -4,7 +4,7 @@
 #include "include/types.h"
 #include "include/vector.h"
 #include "include/vector_s_count.h"
-#include "include/node_h_tree.h"
+#include "include/h_node_h_tree.h"
 
 extern size_t symbols;
 
@@ -12,7 +12,6 @@ void file_read(vector *nm_arr, vector_s_count **cnt_nm_arr, FILE *fin)
 {
     __size_smbls ch;
     int int_ch;
-    int i = 0;
     while (!feof(fin))
     {
         fscanf(fin, "%c", &ch);
@@ -20,15 +19,15 @@ void file_read(vector *nm_arr, vector_s_count **cnt_nm_arr, FILE *fin)
         vector_push_back(nm_arr, ch);
         cnt_nm_arr[int_ch]->symbol = ch;
         cnt_nm_arr[int_ch]->weight++;
-        i++;
     }
 }
 
 void fwrite_s_codes(vector_s_count **codes_array, uint8_t *encode_vector,
-                    __size_smbls count, __size_smbls past_byte_leght,
-                    uint32_t total_bytes, FILE *fout)
+                    __size_smbls count, uint64_t decode_message_leght,
+                    uint64_t total_bist, FILE *fout)
 {
     fwrite(&count, sizeof(__size_smbls), 1, fout);
+    printf("total symbols %d\n", count);
     for (size_t i = 0; i < symbols; i++)
     {
         if (codes_array[i]->weight > 0)
@@ -38,6 +37,16 @@ void fwrite_s_codes(vector_s_count **codes_array, uint8_t *encode_vector,
             fwrite(&codes_array[i]->code, sizeof(code_type), 1, fout);
         }
     }
-    fwrite(&past_byte_leght, sizeof(__size_smbls), 1, fout);
-    fwrite(encode_vector, sizeof(uint8_t), total_bytes, fout);
+
+    printf("decode_message_leght %ld\n", decode_message_leght);
+    printf("size of encode_message (bit) %ld\n", total_bist);
+    fwrite(&decode_message_leght, sizeof(uint64_t), 1, fout);
+    fwrite(&total_bist, sizeof(uint64_t), 1, fout);
+
+    printf("fwrite message bytes %ld\n", fwrite(encode_vector, sizeof(uint8_t), total_bist / 8 + 1, fout));
+}
+
+void fwrite_decode_message(char *decode_message, FILE *fout)
+{
+    fprintf(fout, "%s", decode_message);
 }
