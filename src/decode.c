@@ -28,8 +28,13 @@ void decode(char *name_fin, char *name_fout)
     fread(&count, sizeof(__size_smbls), 1, fin);
     printf("total symbols %d\n", count);
 
-    s_node *tree = NULL;
-    s_node **c_symbols = s_node_itit(count);
+    tree *fds = malloc(sizeof(*fds));
+    if (fds == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+    fds->head = NULL;
+    s_node *c_symbols = s_node_itit(count);
     if (c_symbols == NULL)
     {
         exit(EXIT_FAILURE);
@@ -37,10 +42,10 @@ void decode(char *name_fin, char *name_fout)
 
     for (uint8_t i = 0; i < count; i++)
     {
-        fread(&c_symbols[i]->symbol, sizeof(__size_smbls), 1, fin);
-        fread(&c_symbols[i]->lenght, sizeof(uint8_t), 1, fin);
-        fread(&c_symbols[i]->code, sizeof(code_type), 1, fin);
-        printf("%c %0x %0x\n", c_symbols[i]->symbol, c_symbols[i]->lenght, c_symbols[i]->code);
+        fread(&c_symbols[i].symbol, sizeof(__size_smbls), 1, fin);
+        fread(&c_symbols[i].lenght, sizeof(uint8_t), 1, fin);
+        fread(&c_symbols[i].code, sizeof(code_type), 1, fin);
+        printf("%c %0x %0x\n", c_symbols[i].symbol, c_symbols[i].lenght, c_symbols[i].code);
     }
     fread(&sizeof_decode_message, sizeof(uint64_t), 1, fin);
     printf("decode message lenght %ld\n", sizeof_decode_message);
@@ -50,22 +55,20 @@ void decode(char *name_fin, char *name_fout)
 
     printf("fread message bytes %ld\n", fread(encode_message, sizeof(uint8_t), sizeof_encode_message / 8 + 1, fin));
 
-    char decode_message[sizeof_decode_message];
+    char decode_message[sizeof_decode_message + 1];
 
     s_node_sort(c_symbols, count);
-    s_tree_node_add(&tree, c_symbols, count);
+    s_tree_node_add(fds, c_symbols, count);
 
-    decode_process(tree, encode_message, decode_message, sizeof_encode_message);
+    decode_process(fds, encode_message, decode_message, sizeof_encode_message);
 
-    printf("\n----------\n%s\n----------\n", decode_message);
-    //на моем компьютере происходит аварийная остановка при вызове низлежащей функции
-    //fwrite_decode_message(decode_message, fout);
+    fwrite_decode_message(decode_message, fout);
     fclose(fin);
     fclose(fout);
     free(c_symbols);
     return;
 }
-void decode_process(s_node *tree, uint8_t *encode_message, char *decode_message,
+void decode_process(tree *fds, uint8_t *encode_message, char *decode_message,
                     uint64_t sizeof_encode_message)
 {
     uint64_t byte = 0;
@@ -97,7 +100,7 @@ void decode_process(s_node *tree, uint8_t *encode_message, char *decode_message,
             total_bits++;
             lenght++;
 
-        } while ((symbol = search_symbol(tree, tmp_code, lenght)) == -1);
+        } while ((symbol = search_symbol(fds, tmp_code, lenght)) == -1);
         decode_message[decode_message_possition] = symbol;
         decode_message_possition++;
     }

@@ -30,29 +30,23 @@ CTEST(vector_s_count_init_, test_1)
 CTEST(s_node_init_, test_1)
 {
     uint8_t count = 10;
-    s_node **s_n = s_node_itit(count);
+    s_node *s_n = s_node_itit(count);
     ASSERT_NOT_NULL(s_n);
 }
 CTEST(search_symbol_, test_1)
 {
-    s_node tree = {'a', 2, 0x2, NULL, NULL, NULL};
+    s_node node = {'a', 2, 0x2, NULL, NULL, NULL};
+    tree tre;
+    tre.head = &node;
     char expected = -1;
-    char real = search_symbol(&tree, 0x2, 2);
+    char real = search_symbol(&tre, 0x2, 2);
     ASSERT_NOT_EQUAL(expected, real);
 }
-CTEST(search_symbol_, test_2)
-{
-    s_node *tree = NULL;
-    char expected = -1;
-    char real = search_symbol(tree, 0x2, 2);
-    ASSERT_EQUAL(expected, real);
-}
 
-/* на моей системе (Linux) происходит ошибка при выделении памяти
 CTEST(h_tree_init_, test_1)
 {
-    h_tree *tree = h_tree_init();
-    ASSERT_NOT_NULL(tree);
+    h_tree *tre = h_tree_init();
+    ASSERT_NOT_NULL(tre);
 }
 CTEST(h_tree_node_init_, test_1)
 {
@@ -61,9 +55,9 @@ CTEST(h_tree_node_init_, test_1)
 }
 CTEST(dequeue_min_, test_1)
 {
-    h_tree *tree = h_tree_init();
+    h_tree *tre = h_tree_init();
     h_node *node = h_node_init('a', 3, 0);
-    h_tree_node_add(tree, node->s, node->weight);
-    h_node *node_min = dequeue_min(tree);
+    h_tree_node_add(tre, node->s, node->weight);
+    h_node *node_min = dequeue_min(tre);
     ASSERT_NOT_NULL(node_min);
-}*/
+}

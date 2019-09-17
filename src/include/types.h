@@ -49,5 +49,8 @@ struct s_node
     s_node *left;
     s_node *right;
 };
-
+typedef struct
+{
+    s_node *head;
+} tree;
 #endif

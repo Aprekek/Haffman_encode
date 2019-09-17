@@ -38,8 +38,8 @@ void encode(char *name_fin, char *name_fout)
     {
         exit(EXIT_FAILURE);
     }
-    h_tree *tree = h_tree_init();
-    if (tree == NULL)
+    h_tree *h_tre = h_tree_init();
+    if (h_tre == NULL)
     {
         exit(EXIT_FAILURE);
     }
@@ -54,8 +54,8 @@ void encode(char *name_fin, char *name_fout)
 
     Sort(cnt_symbols_arr);
 
-    size = h_tree_sift(tree, cnt_symbols_arr);
-    extraction_code(tree, symbols_code, size);
+    size = h_tree_sift(h_tre, cnt_symbols_arr);
+    extraction_code(h_tre, symbols_code, size);
 
     uint8_t *code_vector = (uint8_t *)malloc(sizeof(uint8_t) * symbols_arr->size);
     if (code_vector == NULL)
@@ -71,7 +71,7 @@ void encode(char *name_fin, char *name_fout)
     }
     fwrite_s_codes(symbols_code, code_vector, size, symbols_arr->size, total_bits, fout);
     free(code_vector);
-    free(tree);
+    free(h_tre);
     free(symbols_code);
     free(cnt_symbols_arr);
     free(symbols_arr->array);
