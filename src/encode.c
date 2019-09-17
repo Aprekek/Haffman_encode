@@ -63,12 +63,7 @@ void encode(char *name_fin, char *name_fout)
         exit(EXIT_FAILURE);
     }
     uint64_t total_bits = encode_process(code_vector, symbols_arr, symbols_code);
-    for (size_t i = 0; i < symbols; i++)
-    {
-        if (symbols_code[i]->weight != 0)
-            printf("%c %0x %0x\n", symbols_code[i]->symbol, symbols_code[i]->lenght,
-                   symbols_code[i]->code);
-    }
+
     fwrite_s_codes(symbols_code, code_vector, size, symbols_arr->size, total_bits, fout);
     free(code_vector);
     free(h_tre);

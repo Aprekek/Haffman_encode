@@ -45,7 +45,6 @@ void decode(char *name_fin, char *name_fout)
         fread(&c_symbols[i].symbol, sizeof(__size_smbls), 1, fin);
         fread(&c_symbols[i].lenght, sizeof(uint8_t), 1, fin);
         fread(&c_symbols[i].code, sizeof(code_type), 1, fin);
-        printf("%c %0x %0x\n", c_symbols[i].symbol, c_symbols[i].lenght, c_symbols[i].code);
     }
     fread(&sizeof_decode_message, sizeof(uint64_t), 1, fin);
     printf("decode message lenght %ld\n", sizeof_decode_message);
